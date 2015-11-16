@@ -130,6 +130,18 @@ Type: `Boolean`
 
 Keep HTML comment when processing
 
+#### cssBundlePath
+Type: `String`
+Can be used in place of a build block path defined in the HTML.  If specified this path will be used instead of the HTML build block.  Applies only to the .css bundle path.
+
+#### jsBundlePath
+Type: `String`
+Can be used in place of a build block path defined in the HTML.  If specified this path will be used instead of the HTML build block.  Applies only to the .js bundle path.
+
+#### enableAsyncJs
+Type: `Boolean`
+Used to add the async flag to the ```<script src="..." async></script>``` tag
+
 ## Use case
 
 ```
