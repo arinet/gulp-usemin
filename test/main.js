@@ -470,6 +470,24 @@ describe('gulp-usemin', function() {
       });
     });
 
+    describe('async option:', function() {
+      var expectedName = 'simple-js.html';
+      function compare(result, callback) {
+        var stream = usemin({enableAsyncJs: true});
+        stream.on('data', callback);
+        stream.write(getFixture(expectedName));
+      }
+      it('has async tag', function(done) {
+        var expected = '<script src="app.js" async></script>';
+        compare(expected,  function(newFile) {
+            if (path.basename(newFile.path) === expectedName) {
+              assert.equal(String(newFile.contents), String(expected));
+              done();
+            }
+          });
+      });
+    });
+
     describe('conditional comments:', function() {
       function compare(name, expectedName, done) {
         var stream = usemin();
