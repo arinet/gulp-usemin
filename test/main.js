@@ -470,6 +470,42 @@ describe('gulp-usemin', function() {
       });
     });
 
+    describe('jsBundlePath option:', function() {
+      var expectedName = 'simple-js.html';
+      function compare(result, callback) {
+        var stream = usemin({jsBundlePath: 'jsthing.js'});
+        stream.on('data', callback);
+        stream.write(getFixture(expectedName));
+      }
+      it('outputs absolute path', function(done) {
+        var expected = '<script src="jsthing.js"></script>';
+        compare(expected,  function(newFile) {
+            if (path.basename(newFile.path) === expectedName) {
+              assert.equal(String(newFile.contents), String(expected));
+              done();
+            }
+          });
+      });
+    });
+
+    describe('cssBundlePath option:', function() {
+      var expectedName = 'simple-css.html';
+      function compare(result, callback) {
+        var stream = usemin({cssBundlePath: 'cssthing.css'});
+        stream.on('data', callback);
+        stream.write(getFixture(expectedName));
+      }
+      it('outputs absolute path', function(done) {
+        var expected = '<link rel="stylesheet" href="cssthing.css"/>';
+        compare(expected,  function(newFile) {
+            if (path.basename(newFile.path) === expectedName) {
+              assert.equal(String(newFile.contents), String(expected));
+              done();
+            }
+          });
+      });
+    });
+
     describe('async option:', function() {
       var expectedName = 'simple-js.html';
       function compare(result, callback) {
