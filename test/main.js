@@ -453,7 +453,7 @@ describe('gulp-usemin', function() {
 
         stream.on('data', function(newFile) {
           if (path.basename(newFile.path) === expectedName) {
-            assert.equal(String(getExpected(expectedName).contents), String(newFile.contents));
+            assert.equal(String(newFile.contents), String(getExpected(expectedName).contents));
             done();
           }
         });
@@ -470,15 +470,15 @@ describe('gulp-usemin', function() {
       });
     });
 
-    describe('jsBundlePath option:', function() {
+    describe('outputJsPath option:', function() {
       var expectedName = 'simple-js.html';
       function compare(result, callback) {
-        var stream = usemin({jsBundlePath: 'jsthing.js'});
+        var stream = usemin({outputJsPath: '/allthethings/jsthing.js'});
         stream.on('data', callback);
         stream.write(getFixture(expectedName));
       }
-      it('outputs absolute path', function(done) {
-        var expected = '<script src="jsthing.js"></script>';
+      it('overrides js filename in html', function(done) {
+        var expected = '<script src="/allthethings/jsthing.js"></script>';
         compare(expected,  function(newFile) {
             if (path.basename(newFile.path) === expectedName) {
               assert.equal(String(newFile.contents), String(expected));
@@ -488,15 +488,52 @@ describe('gulp-usemin', function() {
       });
     });
 
-    describe('cssBundlePath option:', function() {
+    describe('outputCssPath option:', function() {
       var expectedName = 'simple-css.html';
       function compare(result, callback) {
-        var stream = usemin({cssBundlePath: 'cssthing.css'});
+        var stream = usemin({outputCssPath: '/thething/cssthing.css',
+		outputRelativePath:"/thething/"});
         stream.on('data', callback);
         stream.write(getFixture(expectedName));
       }
-      it('outputs absolute path', function(done) {
-        var expected = '<link rel="stylesheet" href="cssthing.css"/>';
+      it('overrides css filename in html', function(done) {
+        var expected = '<link rel="stylesheet" href="/thething/cssthing.css"/>';
+        compare(expected,  function(newFile) {
+            if (path.basename(newFile.path) === expectedName) {
+              assert.equal(String(newFile.contents), String(expected));
+              done();
+            }
+          });
+      });
+    });
+	
+	 describe('jsBundlePath option:', function() {
+      var expectedName = 'simple-js.html';
+      function compare(result, callback) {
+        var stream = usemin({jsBundlePath: "/folder1/folder2/ps.js"});
+        stream.on('data', callback);
+        stream.write(getFixture(expectedName));
+      }
+      it('output path in js tag is overriden', function(done) {
+        var expected = '<script src="/folder1/folder2/ps.js"></script>';
+        compare(expected,  function(newFile) {
+            if (path.basename(newFile.path) === expectedName) {
+              assert.equal(String(newFile.contents), String(expected));
+              done();
+            }
+          });
+      });
+    });
+	
+	describe('cssBundlepath option:', function() {
+      var expectedName = 'simple-css.html';
+      function compare(result, callback) {
+        var stream = usemin({cssBundlePath: '/folder1/folder2/stylebundle.css'});
+        stream.on('data', callback);
+        stream.write(getFixture(expectedName));
+      }
+      it('output path in css tag is overriden', function(done) {
+        var expected = '<link rel="stylesheet" href="/folder1/folder2/stylebundle.css"/>';
         compare(expected,  function(newFile) {
             if (path.basename(newFile.path) === expectedName) {
               assert.equal(String(newFile.contents), String(expected));
@@ -506,18 +543,45 @@ describe('gulp-usemin', function() {
       });
     });
 
+	describe('async in build tag:', function() {
+      var expectedName = 'simple-js-async.html';
+      function compare(name, expectedName, done) {
+        var stream = usemin({});
+         stream.on('data', function(newFile) {
+          if (path.basename(newFile.path) === name) {
+            assert.equal(String(newFile.contents), String(getExpected(expectedName).contents));
+            done();
+          }
+      });
+	    stream.write(getFixture(name));
+	  }
+      it('has async tag', function(done) {
+        compare(expectedName,expectedName, done);
+      });
+    });
+	
     describe('async option:', function() {
       var expectedName = 'simple-js.html';
-      function compare(result, callback) {
-        var stream = usemin({enableAsyncJs: true});
+      function compare(result, enableAsync, callback) {
+        var stream = usemin({enableAsyncJs: enableAsync});
         stream.on('data', callback);
         stream.write(getFixture(expectedName));
       }
       it('has async tag', function(done) {
         var expected = '<script src="app.js" async></script>';
-        compare(expected,  function(newFile) {
+        compare(expected, true,  function(newFile) {
             if (path.basename(newFile.path) === expectedName) {
-              assert.equal(String(newFile.contents), String(expected));
+              assert.equal(String(expected),String(newFile.contents));
+              done();
+            }
+          });
+      });
+	  
+	  it('has does not have async tag', function(done) {
+        var expected = '<script src="app.js"></script>';
+        compare(expected, false, function(newFile) {
+            if (path.basename(newFile.path) === expectedName) {
+              assert.equal(String(expected), String(newFile.contents));
               done();
             }
           });

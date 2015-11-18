@@ -132,15 +132,23 @@ Keep HTML comment when processing
 
 #### cssBundlePath
 Type: `String`
-Can be used in place of a build block path defined in the HTML.  If specified this path will be used instead of the HTML build block.  Applies only to the .css bundle path.
+Can be used in place of a build block path defined in the HTML.  If specified this path will be used instead of the HTML build block.  Applies only to the .css bundle path.  If used without specifying outputCssPath, it will determine the file output location.
 
 #### jsBundlePath
 Type: `String`
-Can be used in place of a build block path defined in the HTML.  If specified this path will be used instead of the HTML build block.  Applies only to the .js bundle path.
+Can be used in place of a build block path defined in the HTML.  If specified this path will be used instead of the HTML build block.  Applies only to the .js bundle path. If used without specifying outputJsPath, it will determine the file output location.
+
+#### outputJsPath
+Type: `String`
+If specified this path will be used as the output location of the js build block, decoupling the actual output path from the specified build block path. Can be used with the outputRelativePath.  This does not affect the build block path.  
+
+#### outputCssPath 
+Type: `String`
+If specified this path will be used as the output location of the css build block, decoupling the actual output path from the specified build block path. Can be used with the outputRelativePath.  This does not affect the build block path. 
 
 #### enableAsyncJs
 Type: `Boolean`
-Used to add the async flag to the ```<script src="..." async></script>``` tag
+Used to add the async flag to all the ```<script src="..." async></script>``` tags
 
 ## Use case
 
