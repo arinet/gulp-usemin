@@ -68,6 +68,7 @@ Blocks are expressed as:
 - **pipelineId**: pipeline id for options or *remove* to remove a section
 - **alternate search path**: (optional) By default the input files are relative to the treated file. Alternate search path allows one to change that
 - **path**: the file path of the optimized file, the target output
+- **async**: if specified adds the html5 async attribute to the output script tag (only works on build blocks processing script.
 
 An example of this in completed form can be seen below:
 
@@ -82,7 +83,7 @@ An example of this in completed form can be seen below:
 <script src="../lib/angular-animate-min.js"></script>
 <!-- endbuild -->
 
-<!-- build:js1 js/app.js -->
+<!-- build:js1 js/app.js async-->
 <script src="js/app.js"></script>
 <script src="js/controllers/thing-controller.js"></script>
 <script src="js/models/thing-model.js"></script>
@@ -126,9 +127,7 @@ Type: `String`
 Relative location to html file for new concatenated js and css.
 
 #### enableHtmlComment
-Type: `Boolean`
-
-Keep HTML comment when processing
+Type: `Boolean`Keep HTML comment when processing
 
 #### cssBundlePath
 Type: `String`
@@ -136,7 +135,7 @@ Can be used in place of a build block path defined in the HTML.  If specified th
 
 #### jsBundlePath
 Type: `String`
-Can be used in place of a build block path defined in the HTML.  If specified this path will be used instead of the HTML build block.  Applies only to the .js bundle path. If used without specifying outputJsPath, it will determine the file output location.
+Can be used in place of a build block path defined in the HTML.  If specified this path will be used instead of the HTML build block.  Applies only to the .js bundle path. If used without specifying outputJsPath, it will determine the file output location. 
 
 #### outputJsPath
 Type: `String`
@@ -146,9 +145,9 @@ If specified this path will be used as the output location of the js build block
 Type: `String`
 If specified this path will be used as the output location of the css build block, decoupling the actual output path from the specified build block path. Can be used with the outputRelativePath.  This does not affect the build block path. 
 
-#### enableAsyncJs
-Type: `Boolean`
-Used to add the async flag to all the ```<script src="..." async></script>``` tags
+##Note:
+
+ If the html defines multiple build blocks, and any path overrides (cssBundlePath, jsBundlePath, outputJsPath, outputCssPath) are used, the output script tags will be output with an integer appended to the file name file_1.js.
 
 ## Use case
 
