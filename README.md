@@ -217,6 +217,41 @@ This will generate the following output:
     <script src="js/optimized.js"></script>
 ```
 
+We want our files to be generated in the `dist` directory, however we want our src tag to point at `production/dist`. This decouples the source location from the build location. `gulpfile.js` should contain the following block:  Note: the same principle can be applied to css  using outputCssPath and cssBundlePath.
+
+```javascript
+gulp.task('usemin', function () {
+  return gulp.src('./app/index.html')
+      .pipe(usemin({
+        js: [uglify()],
+        jsBundlePath "/production/dist/optimized.js,
+		outputJsPath "/dist/optimized.js,
+      }))
+      .pipe(gulp.dest('dist/'));
+});
+```
+
+This will generate the following output:
+
+```
+|
++- app
+|   +- index.html
+|   +- assets
+|       +- js
+|          +- foo.js
+|          +- bar.js
++- dist
+|   +- index.html
+|   +- js
+|       +- optimized.js
+```
+
+`index.html` output:
+
+```<script src="production/js/optimized.js"></script>
+```
+
 ## Changelog
 
 #####0.3.14
