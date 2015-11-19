@@ -478,7 +478,7 @@ describe('gulp-usemin', function() {
         stream.write(getFixture(expectedName));
       }
       it('overrides js output path and filename in html', function(done) {
-        var expected = '<script src="/allthethings/jsthing.js"></script>';
+        var expected = '<script src="/allthethings/jsthing_0.js"></script>';
         compare(expected,  function(newFile) {
             if (path.basename(newFile.path) === expectedName) {
               assert.equal(String(newFile.contents), String(expected));
@@ -497,7 +497,7 @@ describe('gulp-usemin', function() {
         stream.write(getFixture(expectedName));
       }
       it('overrides css output path and filename in html', function(done) {
-        var expected = '<link rel="stylesheet" href="/thething/cssthing.css"/>';
+        var expected = '<link rel="stylesheet" href="/thething/cssthing_0.css"/>';
         compare(expected,  function(newFile) {
             if (path.basename(newFile.path) === expectedName) {
               assert.equal(String(newFile.contents), String(expected));
@@ -515,7 +515,7 @@ describe('gulp-usemin', function() {
         stream.write(getFixture(expectedName));
       }
       it('output path for js in html is overriden', function(done) {
-        var expected = '<script src="/folder1/folder2/ps.js"></script>';
+        var expected = '<script src="/folder1/folder2/ps_0.js"></script>';
         compare(expected,  function(newFile) {
             if (path.basename(newFile.path) === expectedName) {
               assert.equal(String(newFile.contents), String(expected));
@@ -533,7 +533,7 @@ describe('gulp-usemin', function() {
         stream.write(getFixture(expectedName));
       }
       it('output path for css in html is overriden', function(done) {
-        var expected = '<link rel="stylesheet" href="/folder1/folder2/stylebundle.css"/>';
+        var expected = '<link rel="stylesheet" href="/folder1/folder2/stylebundle_0.css"/>';
         compare(expected,  function(newFile) {
             if (path.basename(newFile.path) === expectedName) {
               assert.equal(String(newFile.contents), String(expected));
