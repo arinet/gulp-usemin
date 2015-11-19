@@ -224,8 +224,8 @@ gulp.task('usemin', function () {
   return gulp.src('./app/index.html')
       .pipe(usemin({
         js: [uglify()],
-        jsBundlePath "/production/dist/optimized.js,
-		outputJsPath "/dist/optimized.js,
+        jsBundlePath "/production/dist/optimized.js",
+		outputJsPath "/dist/optimized.js"
       }))
       .pipe(gulp.dest('dist/'));
 });
