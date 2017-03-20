@@ -19,8 +19,8 @@ Then, add it to your `gulpfile.js`:
 ```javascript
 var usemin = require('gulp-usemin');
 var uglify = require('gulp-uglify');
-var minifyHtml = require('gulp-minify-html');
-var minifyCss = require('gulp-minify-css');
+var htmlmin = require('gulp-htmlmin');
+var cleanCss = require('gulp-clean-css');
 var rev = require('gulp-rev');
 
 
@@ -28,10 +28,10 @@ gulp.task('usemin', function() {
   return gulp.src('./*.html')
     .pipe(usemin({
       css: [ rev() ],
-      html: [ minifyHtml({ empty: true }) ],
+      html: [ htmlmin({ collapseWhitespace: true }) ],
       js: [ uglify(), rev() ],
       inlinejs: [ uglify() ],
-      inlinecss: [ minifyCss(), 'concat' ]
+      inlinecss: [ cleanCss(), 'concat' ]
     }))
     .pipe(gulp.dest('build/'));
 });
@@ -44,10 +44,10 @@ gulp.task('usemin', function() {
   return gulp.src('./*.html')
     .pipe(usemin({
       css: [ rev ],
-      html: [ function () {return minifyHtml({ empty: true });} ],
+      html: [ function () {return htmlmin({ collapseWhitespace: true });} ],
       js: [ uglify, rev ],
       inlinejs: [ uglify ],
-      inlinecss: [ minifyCss, 'concat' ]
+      inlinecss: [ cleanCss, 'concat' ]
     }))
     .pipe(gulp.dest('build/'));
 });
@@ -76,6 +76,11 @@ An example of this in completed form can be seen below:
 <!-- build:css style.css -->
 <link rel="stylesheet" href="css/clear.css"/>
 <link rel="stylesheet" href="css/main.css"/>
+<!-- endbuild -->
+
+<!-- build:htmlimport components-packed.html -->
+<link rel="import" href="components-a.html">
+<link rel="import" href="components-b.html">
 <!-- endbuild -->
 
 <!-- build:js js/lib.js -->
@@ -148,6 +153,41 @@ If specified this path will be used as the output location of the css build bloc
 ##Note:
 
  If the html defines multiple build blocks, and any path overrides (cssBundlePath, jsBundlePath, outputJsPath, outputCssPath) are used, the output script tags will be output with an integer appended to the file name file_1.js.
+
+#### jsAttributes
+Type: `Object`
+
+Attach HTML attributes to the output js file.
+For Example :
+```js
+gulp.task('usemin', function() {
+  return gulp.src('./index.html')
+    .pipe(usemin({
+      html: [],
+      jsAttributes : {
+        async : true,
+        lorem : 'ipsum',
+        seq   : [1, 2, 1]
+      },
+      js: [ ],
+      js1:[ ],
+      js2:[ ]
+    }))
+    .pipe(gulp.dest('./'));
+});
+```
+Will give you :
+```html
+<script src="./lib.js" async lorem="ipsum" seq="1"></script>
+<script src="./app.js" async lorem="ipsum" seq="2"></script>
+<script src="./extra.js" async lorem="ipsum" seq="1"></script>
+```
+As your built script tag.
+
+#### skipMissingResources
+Type: `Boolean`
+
+Allows missing resources to be skipped, instead of throwing an error.
 
 ## Use case
 
@@ -254,7 +294,40 @@ This will generate the following output:
 
 ## Changelog
 
-#####0.3.14
+#####0.3.28
+- Update dependancies and replace deprecated packages (by JamyGolden)
+
+#####0.3.27
+- Updated glob dependency (by icholy)
+
+#####0.3.26
+- Fix for css media queries (by akempes)
+
+#####0.3.24
+- Added option to skip missing resources (by adamhenson)
+
+#####0.3.23
+- Added support array value for cssAttributes (by MillerRen)
+
+#####0.3.22
+- Added html import support (by linfaxin)
+
+#####0.3.21
+- Added support paths with querystring or hash (by Lanfei)
+
+#####0.3.20
+- Added support array value for jsAttributes (by kuitos)
+
+#####0.3.18
+- Fixed relative path for script in subfolder bug
+
+#####0.3.17
+- Fixed block output when stream returns multiple files (by maksidom)
+
+#####0.3.16
+- Added feature to assign attributes to js script tags (by sohamkamani)
+
+#####0.3.15
 - Allow proper html output when blocks are empty (by ppowalowski)
 
 #####0.3.14

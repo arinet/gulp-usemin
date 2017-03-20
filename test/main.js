@@ -9,6 +9,7 @@ var gutil = require('gulp-util');
 var PassThrough = require('stream').PassThrough;
 var path = require('path');
 var usemin = require('../index');
+var vfs = require('vinyl-fs');
 
 function getFile(filePath) {
   return new gutil.File({
@@ -29,8 +30,8 @@ function getExpected(filePath) {
 describe('gulp-usemin', function() {
   describe('allow removal sections', function() {
       function compare(name, expectedName, done) {
-        var htmlmin = require('gulp-minify-html');
-        var stream = usemin({html: [htmlmin({empty: true, quotes: true})]});
+        var htmlmin = require('gulp-htmlmin');
+        var stream = usemin({html: [htmlmin({collapseWhitespace: true})]});
 
         stream.on('data', function(newFile) {
           if (path.basename(newFile.path) === name) {
@@ -103,10 +104,10 @@ describe('gulp-usemin', function() {
   describe('should work in buffer mode with', function() {
     describe('minified HTML:', function() {
       function compare(name, expectedName, done, fail) {
-        var htmlmin = require('gulp-minify-html');
+        var htmlmin = require('gulp-htmlmin');
         var stream = usemin({
           html: [function() {
-            return htmlmin({empty: true});
+            return htmlmin({collapseWhitespace: true, removeAttributeQuotes: true});
           }]
         });
 
@@ -157,6 +158,10 @@ describe('gulp-usemin', function() {
 
       it('complex with path (css + js)', function(done) {
         compare('complex-path.html', 'min-complex-path.html', done);
+      });
+
+      it('paths with querystring', function(done) {
+        compare('paths-with-querystring.html', 'min-paths-with-querystring.html', done);
       });
     });
 
@@ -217,11 +222,15 @@ describe('gulp-usemin', function() {
       it('multiple alternative paths', function(done) {
         compare('multiple-alternative-paths.html', 'multiple-alternative-paths.html', done);
       });
+
+      it('paths with querystring', function(done) {
+        compare('paths-with-querystring.html', 'paths-with-querystring.html', done);
+      });
     });
 
     describe('minified CSS:', function() {
       function compare(fixtureName, name, expectedName, end) {
-        var cssmin = require('gulp-minify-css');
+        var cssmin = require('gulp-clean-css');
         var stream = usemin({css: ['concat', cssmin()]});
 
         stream.on('data', function(newFile) {
@@ -353,7 +362,7 @@ describe('gulp-usemin', function() {
     });
 
     it('many html files', function(done) {
-      var cssmin = require('gulp-minify-css');
+      var cssmin = require('gulp-clean-css');
       var jsmin = require('gulp-uglify');
       var rev = require('gulp-rev');
       var stream = usemin({
@@ -396,7 +405,7 @@ describe('gulp-usemin', function() {
     });
 
     it('many blocks', function(done) {
-      var cssmin = require('gulp-minify-css');
+      var cssmin = require('gulp-clean-css');
       var jsmin = require('gulp-uglify');
       var rev = require('gulp-rev');
       var stream = usemin({
@@ -683,9 +692,40 @@ describe('gulp-usemin', function() {
 
     });
 
+    describe('array jsAttributes:', function() {
+
+      function compare(fixtureName, name, end) {
+        var stream = usemin({
+          jsAttributes: {
+            seq: [1, 2, 1, 3],
+            color: ['blue', 'red', 'yellow', 'pink']
+          },
+          js: [],
+          js1: [],
+          js2: [],
+          js3: []
+
+        });
+
+        stream.on('data', function(newFile) {
+          if (path.basename(newFile.path) === name) {
+            assert.equal(String(newFile.contents), String(getExpected(name).contents));
+            end();
+          }
+        });
+
+        stream.write(getFixture(fixtureName));
+      }
+
+      it('js attributes with array define', function (done) {
+        compare('array-js-attributes.html', 'array-js-attributes.html', done);
+      });
+
+    });
+
     it('async task', function(done) {
       var less = require('gulp-less');
-      var cssmin = require('gulp-minify-css');
+      var cssmin = require('gulp-clean-css');
       var stream = usemin({
         less: [less(), 'concat', cssmin()]
       });
@@ -702,5 +742,64 @@ describe('gulp-usemin', function() {
 
       stream.write(getFixture('async-less.html'));
     });
+
+    it('subfolders', function(done) {
+      var stream = usemin();
+      var jsExist = false;
+      var nameJs = path.join('subfolder', 'app.js');
+
+      stream.on('data', function(newFile) {
+        if (path.basename(newFile.path) === path.basename(nameJs)) {
+          jsExist = true;
+          assert.equal(path.relative(newFile.base, newFile.path), nameJs);
+          assert.equal(String(getExpected(nameJs).contents), String(newFile.contents));
+        }
+        else {
+          assert.ok(jsExist);
+          done();
+        }
+      });
+
+      vfs.src('test/fixtures/**/index.html')
+        .pipe(stream);
+    });
+  });
+
+  it('multiple files in stream', function(done) {
+    var multipleFiles = function() {
+      var through = require('through2');
+      var File = gutil.File;
+
+      return through.obj(function(file) {
+        var stream = this;
+
+        stream.push(new File({
+          cwd: file.cwd,
+          base: file.base,
+          path: file.path,
+          contents: new Buffer('test1')
+        }));
+
+        stream.push(new File({
+          cwd: file.cwd,
+          base: file.base,
+          path: file.path,
+          contents: new Buffer('test2')
+        }));
+      });
+    };
+    var stream = usemin({
+      css: [multipleFiles],
+      js: [multipleFiles]
+    });
+
+    stream.on('data', function(newFile) {
+      if (path.basename(newFile.path) === path.basename('multiple-files.html')) {
+        assert.equal(String(getExpected('multiple-files.html').contents), String(newFile.contents));
+        done();
+      }
+    });
+
+    stream.write(getFixture('multiple-files.html'));
   });
 });
